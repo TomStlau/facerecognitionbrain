@@ -1,12 +1,19 @@
 import React from 'react'
 import CardList from './CardList'
-import { robots } from './robots'
 import SearchBox from './SearchBox'
 import './App.css'
 
 
 const App = () => {
+    
+    
     const [searchfield, setSearchfield] = React.useState('')
+    const [robots, setRobots] = React.useState([])
+    React.useEffect(() => {
+        fetch('https://jsonplaceholder.typicode.com/users')
+            .then(response => response.json())
+            .then(users => {setRobots(users)})
+    }, [])
     const onSearchChange = (event) => {
         setSearchfield(event.target.value)
     }

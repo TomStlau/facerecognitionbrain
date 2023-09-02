@@ -1,0 +1,10 @@
+.back-honey {
+        height: 100%;
+        background-image:
+      url('https://besthqwallpapers.com/Uploads/3-3-2021/158819/thumb2-3d-yellow-honeycomb-texture-3d-honeycomb-background-honeycomb-texture-3d-honey-texture-3d-hexagons-texture.jpg');
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: center;
+        z-index: -1;
+        filter: alpha(opacity=50);
+    }

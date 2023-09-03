@@ -9,10 +9,14 @@ import Particles from 'react-tsparticles'
 import { loadFull } from 'tsparticles'
 import ParticlesCongig from './components/ParticlesConfig/ParticlesConfig'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition'
+import Signin from './components/Signin/Signin'
+import Register from './components/Register/Register'
 
 function App () {
+  const [route, setRoute] = React.useState('signin')
   const [input, setInput] = React.useState('')
   const [myImage, setMyImage] = React.useState('')
+
   const PAT = 'e8fa55844ea24587969cfd8b31d4410a'
   // Specify the correct user_id/app_id pairings
   // Since you're making inferences outside your app's scope
@@ -21,6 +25,18 @@ function App () {
   // Change these to whatever model and image URL you want to use
   const MODEL_ID = 'face-detection'
   const IMAGE_URL = input
+
+  const [signedIn, setSignedIn] = React.useState(false)
+
+  const onRouteChange = route => {
+    if (route === 'signout') {
+      setSignedIn(false)
+    } else if (route === 'home') {
+      setSignedIn(true)
+    }
+
+    setRoute(route)
+  }
   const raw = JSON.stringify({
     user_app_id: {
       user_id: USER_ID,
@@ -103,14 +119,22 @@ function App () {
         }}
         options={ParticlesCongig}
       />
-      <Navigation />
-      <Logo />
-      <Rank />
-      <ImageLinkForm
-        onInputChange={onInputChange}
-        onButtonSubmit={onButtonSubmit}
-      />
-      <FaceRecognition imageUrl={myImage} box={faceBox} />
+      <Navigation onRouteChange={onRouteChange} isSignedIn={signedIn} />
+      {route === 'home' ? (
+        <div>
+          <Logo />
+          <Rank />
+          <ImageLinkForm
+            onInputChange={onInputChange}
+            onButtonSubmit={onButtonSubmit}
+          />
+          <FaceRecognition imageUrl={myImage} box={faceBox} />
+        </div>
+      ) : route === 'signin' ? (
+        <Signin onRouteChange={onRouteChange} />
+      ) : (
+        <Register onRouteChange={onRouteChange} />
+      )}
     </div>
   )
 }

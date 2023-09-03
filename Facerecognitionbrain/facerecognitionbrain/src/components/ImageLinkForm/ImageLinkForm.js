@@ -13,6 +13,11 @@ const ImageLinkForm = ({ onInputChange, onButtonSubmit }) => {
             className='f4 pa2 w-70 center'
             type='text'
             onChange={onInputChange}
+            onKeyDown={event => {
+              if (event.key === 'Enter') {
+                onButtonSubmit()
+              }
+            }}
           />
           <button
             onClick={onButtonSubmit}

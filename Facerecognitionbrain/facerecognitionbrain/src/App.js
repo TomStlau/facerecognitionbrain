@@ -7,26 +7,85 @@ import Rank from './components/Rank/Rank'
 import { useCallback } from 'react'
 import Particles from 'react-tsparticles'
 import { loadFull } from 'tsparticles'
+import ParticlesCongig from './components/ParticlesConfig/ParticlesConfig'
+import FaceRecognition from './components/FaceRecognition/FaceRecognition'
 
 function App () {
+  const [input, setInput] = React.useState('')
+  const [myImage, setMyImage] = React.useState('')
+  const PAT = 'e8fa55844ea24587969cfd8b31d4410a'
+  // Specify the correct user_id/app_id pairings
+  // Since you're making inferences outside your app's scope
+  const USER_ID = 'tomstlau'
+  const APP_ID = 'test'
+  // Change these to whatever model and image URL you want to use
+  const MODEL_ID = 'face-detection'
+  const IMAGE_URL = input
+  const raw = JSON.stringify({
+    user_app_id: {
+      user_id: USER_ID,
+      app_id: APP_ID
+    },
+    inputs: [
+      {
+        data: {
+          image: {
+            url: IMAGE_URL
+          }
+        }
+      }
+    ]
+  })
+
+  const requestOptions = {
+    method: 'POST',
+    headers: {
+      Accept: 'application/json',
+      Authorization: 'Key ' + PAT
+    },
+    body: raw
+  }
   const particlesInit = useCallback(async engine => {
-    console.log(engine)
-    // you can initiate the tsParticles instance (engine) here, adding custom shapes or presets
-    // this loads the tsparticles package bundle, it's the easiest method for getting everything ready
-    // starting from v2 you can add only the features you need reducing the bundle size
     await loadFull(engine)
   }, [])
 
-  const particlesLoaded = useCallback(async container => {
-    console.log(container)
-  }, [])
-
-  const [input, setInput] = React.useState('')
-
-  const onButtonSubmit = () => {}
-
   const onInputChange = event => {
     setInput(event.target.value)
+  }
+  const calculateFaceLocation = data => {
+    const image = document.getElementById('inputimage')
+    const width = Number(image.width)
+    const height = Number(image.height)
+    return data.outputs[0].data.regions.map(region => {
+      const clarifaiFace = region.region_info.bounding_box
+      return {
+        leftCol: clarifaiFace.left_col * width,
+        topRow: clarifaiFace.top_row * height,
+        rightCol: width - clarifaiFace.right_col * width,
+        bottomRow: height - clarifaiFace.bottom_row * height
+      }
+    })
+  }
+
+  const [faceBox, setFaceBox] = React.useState({})
+
+  const displayFaceBox = box => {
+    setFaceBox(box)
+  }
+
+  const onButtonSubmit = () => {
+    setMyImage(input)
+    fetch(
+      'https://api.clarifai.com/v2/models/' + MODEL_ID + '/outputs',
+      requestOptions
+    )
+      .then(response => response.json())
+      .then(result => {
+        const faceLocation = calculateFaceLocation(result)
+        displayFaceBox(faceLocation)
+      })
+
+      .catch(error => console.log('error', error))
   }
 
   return (
@@ -34,7 +93,6 @@ function App () {
       <Particles
         id='tsparticles'
         init={particlesInit}
-        loaded={particlesLoaded}
         style={{
           position: 'absolute',
           zIndex: -1,
@@ -43,75 +101,7 @@ function App () {
           right: 0,
           bottom: 0
         }}
-        options={{
-          fpsLimit: 120,
-          interactivity: {
-            events: {
-              onClick: {
-                enable: true,
-                mode: 'push'
-              },
-              onHover: {
-                enable: true,
-                mode: 'repulse'
-              },
-              resize: true
-            },
-            modes: {
-              push: {
-                quantity: 1
-              },
-              repulse: {
-                distance: 200,
-                duration: 0.4
-              }
-            }
-          },
-          particles: {
-            color: {
-              value: '#ffffff'
-            },
-            links: {
-              color: '#ffffff',
-              distance: 150,
-              enable: true,
-              opacity: 0.5,
-              width: 1
-            },
-            move: {
-              direction: 'none',
-              enable: true,
-              outModes: {
-                default: 'bounce'
-              },
-              random: false,
-              speed: 6,
-              straight: false
-            },
-            number: {
-              density: {
-                enable: true,
-                area: 800
-              },
-              value: 80
-            },
-            opacity: {
-              value: 0.5
-            },
-            shape: {
-              type: 'circle'
-            },
-            size: {
-              value: { min: 1, max: 5 }
-            },
-            zIndex: {
-              value: -10,
-              opacityRate: 1,
-              sizeRate: 1
-            }
-          },
-          detectRetina: true
-        }}
+        options={ParticlesCongig}
       />
       <Navigation />
       <Logo />
@@ -120,7 +110,7 @@ function App () {
         onInputChange={onInputChange}
         onButtonSubmit={onButtonSubmit}
       />
-      {/* <FaceRecognition /> */}
+      <FaceRecognition imageUrl={myImage} box={faceBox} />
     </div>
   )
 }

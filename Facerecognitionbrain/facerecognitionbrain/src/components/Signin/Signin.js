@@ -1,6 +1,6 @@
 import React from 'react'
 
-const Signin = ({ onRouteChange }) => {
+const Signin = ({ onRouteChange, loadUser }) => {
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
 
@@ -27,6 +27,7 @@ const Signin = ({ onRouteChange }) => {
       .then(user => {
         if (user.id) {
           onRouteChange('home')
+          loadUser(user)
         } else {
           onRouteChange('register')
         }
@@ -45,7 +46,7 @@ const Signin = ({ onRouteChange }) => {
                 htmlFor='email-address'
               ></label>
               <input
-                className='pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100'
+                className='b pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100'
                 type='email'
                 name='email'
                 placeholder='Email'

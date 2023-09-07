@@ -28,9 +28,31 @@ function App () {
 
   const [signedIn, setSignedIn] = React.useState(false)
 
+  const [user, setUser] = React.useState({
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  })
+
+  const loadUser = data => {
+    setUser({
+      id: data.id,
+      name: data.name,
+      email: data.email,
+      entries: data.entries,
+      joined: data.joined
+    })
+    setSignedIn(true)
+    setRoute('home')
+  }
+
   const onRouteChange = route => {
     if (route === 'signout') {
       setSignedIn(false)
+      // empty image url
+      setMyImage('')
     } else if (route === 'home') {
       setSignedIn(true)
     }
@@ -96,6 +118,20 @@ function App () {
         requestOptions
       )
       const result = await response.json()
+      if ((input !== null) & (input !== undefined) & (input !== '')) {
+        fetch('http://localhost:3000/image', {
+          method: 'put',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            id: user.id
+          })
+        })
+          .then(response => response.json())
+          .then(count => {
+            setUser({ ...user, entries: count })
+          })
+          .catch(console.log)
+      }
       const faceLocation = calculateFaceLocation(result)
       displayFaceBox(faceLocation)
     } catch (error) {
@@ -122,7 +158,7 @@ function App () {
       {route === 'home' ? (
         <div>
           <Logo />
-          <Rank />
+          <Rank user={user} />
           <ImageLinkForm
             onInputChange={onInputChange}
             onButtonSubmit={onButtonSubmit}
@@ -130,9 +166,9 @@ function App () {
           <FaceRecognition imageUrl={myImage} box={faceBox} />
         </div>
       ) : route === 'register' ? (
-        <Register onRouteChange={onRouteChange} />
+        <Register onRouteChange={onRouteChange} loadUser={loadUser} />
       ) : (
-        <Signin onRouteChange={onRouteChange} />
+        <Signin onRouteChange={onRouteChange} loadUser={loadUser} />
       )}
     </div>
   )

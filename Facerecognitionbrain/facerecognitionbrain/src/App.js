@@ -34,7 +34,6 @@ function App () {
     } else if (route === 'home') {
       setSignedIn(true)
     }
-
     setRoute(route)
   }
   const raw = JSON.stringify({
@@ -89,19 +88,19 @@ function App () {
     setFaceBox(box)
   }
 
-  const onButtonSubmit = () => {
+  const onButtonSubmit = async () => {
     setMyImage(input)
-    fetch(
-      'https://api.clarifai.com/v2/models/' + MODEL_ID + '/outputs',
-      requestOptions
-    )
-      .then(response => response.json())
-      .then(result => {
-        const faceLocation = calculateFaceLocation(result)
-        displayFaceBox(faceLocation)
-      })
-
-      .catch(error => console.log('error', error))
+    try {
+      const response = await fetch(
+        'https://api.clarifai.com/v2/models/' + MODEL_ID + '/outputs',
+        requestOptions
+      )
+      const result = await response.json()
+      const faceLocation = calculateFaceLocation(result)
+      displayFaceBox(faceLocation)
+    } catch (error) {
+      console.log('error', error)
+    }
   }
 
   return (
@@ -130,10 +129,10 @@ function App () {
           />
           <FaceRecognition imageUrl={myImage} box={faceBox} />
         </div>
-      ) : route === 'signin' ? (
-        <Signin onRouteChange={onRouteChange} />
-      ) : (
+      ) : route === 'register' ? (
         <Register onRouteChange={onRouteChange} />
+      ) : (
+        <Signin onRouteChange={onRouteChange} />
       )}
     </div>
   )

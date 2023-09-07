@@ -1,10 +1,42 @@
 import React from 'react'
 
 const Signin = ({ onRouteChange }) => {
+  const [email, setEmail] = React.useState('')
+  const [password, setPassword] = React.useState('')
+
+  const onEmailChange = event => {
+    setEmail(event.target.value)
+  }
+  const onPasswordChange = event => {
+    setPassword(event.target.value)
+  }
+
+  // check if the user exists in the database
+  // if so, then route to home
+  // else, route to register
+  const onSubmitSignIn = () => {
+    fetch('http://localhost:3000/signin', {
+      method: 'post',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        email: email,
+        password: password
+      })
+    })
+      .then(response => response.json())
+      .then(user => {
+        if (user.id) {
+          onRouteChange('home')
+        } else {
+          onRouteChange('register')
+        }
+      })
+  }
+
   return (
     <article className='back-sign br3 ba dark-gray z-999 relative b--black-10 mv4 w-100 w-50-m w-25-l mw6 shadow-5 center'>
       <main className='pa4 black-80 flex justify-center'>
-        <form className='measure '>
+        <div className='measure '>
           <fieldset id='sign_up' className='ba b--transparent ph0 mh0'>
             <legend className='f1 fw6 ph0 mh0 center'>Sign In</legend>
             <div className='mt3'>
@@ -15,9 +47,10 @@ const Signin = ({ onRouteChange }) => {
               <input
                 className='pa2 input-reset ba bg-transparent hover-bg-black hover-white w-100'
                 type='email'
-                name='email-address'
+                name='email'
                 placeholder='Email'
                 id='email-address'
+                onChange={onEmailChange}
               />
             </div>
             <div className='mv3'>
@@ -28,12 +61,13 @@ const Signin = ({ onRouteChange }) => {
                 placeholder='Password'
                 name='password'
                 id='password'
+                onChange={onPasswordChange}
               />
             </div>
           </fieldset>
           <div className=''>
             <input
-              onClick={() => onRouteChange('home')}
+              onClick={() => onSubmitSignIn()}
               className='b ph3 pv2 input-reset ba b--black bg-transparent grow pointer f6 dib'
               type='submit'
               value='Sign in'
@@ -47,7 +81,7 @@ const Signin = ({ onRouteChange }) => {
               Register
             </p>
           </div>
-        </form>
+        </div>
       </main>
     </article>
   )

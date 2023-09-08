@@ -11,19 +11,20 @@ import ParticlesCongig from './components/ParticlesConfig/ParticlesConfig'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition'
 import Signin from './components/Signin/Signin'
 import Register from './components/Register/Register'
+import defaultConfig from './Config/Config'
 
 function App () {
   const [route, setRoute] = React.useState('signin')
   const [input, setInput] = React.useState('')
   const [myImage, setMyImage] = React.useState('')
 
-  const PAT = 'e8fa55844ea24587969cfd8b31d4410a'
+  const PAT = defaultConfig.PAT
   // Specify the correct user_id/app_id pairings
   // Since you're making inferences outside your app's scope
-  const USER_ID = 'tomstlau'
-  const APP_ID = 'test'
+  const USER_ID = defaultConfig.USER_ID
+  const APP_ID = defaultConfig.APP_ID
   // Change these to whatever model and image URL you want to use
-  const MODEL_ID = 'face-detection'
+  const MODEL_ID = defaultConfig.MODEL_ID
   const IMAGE_URL = input
 
   const [signedIn, setSignedIn] = React.useState(false)

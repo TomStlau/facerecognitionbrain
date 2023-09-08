@@ -1,5 +1,4 @@
 import express from 'express'
-const fs = await import('fs')
 import bodyParser from 'body-parser'
 import bcrypt from 'bcrypt'
 import cors from 'cors'
@@ -18,10 +17,6 @@ const db = knex({
 const app = express()
 app.use(bodyParser.json())
 app.use(cors())
-
-app.get('/', (req, res) => {
-  res.json(database.users)
-})
 
 app.post('/signin', (req, res) => {
   const { email, password } = req.body
@@ -43,10 +38,12 @@ app.post('/signin', (req, res) => {
           })
           .catch(err => res.status(400).json('unable to get user'))
       } else {
-        res.status(400).json('wrong credentials')
+        res.status(400).json('The email or the password is not correct.')
       }
     })
-    .catch(err => res.status(400).json('wrong credentials'))
+    .catch(err =>
+      res.status(400).json('The email or the password is not correct.')
+    )
 })
 
 app.post('/register', (req, res) => {
@@ -100,6 +97,7 @@ app.put('/image', (req, res) => {
     .catch(err => res.status(400).json('unable to get entries'))
 })
 
-app.listen(3000, () => {
-  console.log('app is running on port 3000')
+const PORT = process.env.PORT
+app.listen(PORT, () => {
+  console.log(`app is running on port ${PORT}`)
 })

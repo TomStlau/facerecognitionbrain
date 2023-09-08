@@ -20,6 +20,10 @@ const Register = ({ onRouteChange, loadUser }) => {
   // Rest of the component code...
 
   const onRegisterSubmit = async () => {
+    if (!name || !email || !password) {
+      alert('Please enter all fields')
+      return
+    }
     const requestBody = JSON.stringify({
       name,
       email,

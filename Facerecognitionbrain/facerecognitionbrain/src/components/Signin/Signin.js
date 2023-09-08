@@ -14,24 +14,31 @@ const Signin = ({ onRouteChange, loadUser }) => {
   // check if the user exists in the database
   // if so, then route to home
   // else, route to register
-  const onSubmitSignIn = () => {
-    fetch('http://localhost:3000/signin', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        email: email,
-        password: password
+  const onSubmitSignIn = async () => {
+    const requestBody = {
+      email,
+      password
+    }
+
+    try {
+      const response = await fetch('http://localhost:3000/signin', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody)
       })
-    })
-      .then(response => response.json())
-      .then(user => {
-        if (user.id) {
-          onRouteChange('home')
-          loadUser(user)
-        } else {
-          onRouteChange('register')
-        }
-      })
+
+      const user = await response.json()
+
+      if (user.id) {
+        onRouteChange('home')
+        loadUser(user)
+      } else {
+        onRouteChange('register')
+      }
+    } catch (error) {
+      // Handle any errors that occur during the fetch request
+      console.error('An error occurred:', error)
+    }
   }
 
   return (

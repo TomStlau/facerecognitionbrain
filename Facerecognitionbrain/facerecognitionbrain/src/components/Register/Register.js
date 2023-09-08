@@ -4,33 +4,43 @@ const Register = ({ onRouteChange, loadUser }) => {
   const [name, setName] = React.useState('')
   const [email, setEmail] = React.useState('')
   const [password, setPassword] = React.useState('')
-  const onNameChange = event => {
-    setName(event.target.value)
-  }
-  const onEmailChange = event => {
-    setEmail(event.target.value)
-  }
-  const onPasswordChange = event => {
-    setPassword(event.target.value)
-  }
 
-  const onRegisterSubmit = () => {
-    fetch('http://localhost:3000/register', {
-      method: 'post',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        name: name,
-        email: email,
-        password: password
-      })
+  const onNameChange = React.useCallback(event => {
+    setName(event.target.value)
+  }, [])
+
+  const onEmailChange = React.useCallback(event => {
+    setEmail(event.target.value)
+  }, [])
+
+  const onPasswordChange = React.useCallback(event => {
+    setPassword(event.target.value)
+  }, [])
+
+  // Rest of the component code...
+
+  const onRegisterSubmit = async () => {
+    const requestBody = JSON.stringify({
+      name,
+      email,
+      password
     })
-      .then(response => response.json())
-      .then(user => {
-        if (user.id) {
-          loadUser(user)
-          onRouteChange('home')
-        }
+
+    try {
+      const response = await fetch('http://localhost:3000/register', {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: requestBody
       })
+
+      const user = await response.json()
+      if (user.id) {
+        loadUser(user)
+        onRouteChange('home')
+      }
+    } catch (error) {
+      // Handle error
+    }
   }
 
   return (

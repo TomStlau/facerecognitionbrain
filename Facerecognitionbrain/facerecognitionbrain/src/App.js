@@ -56,6 +56,7 @@ function App () {
     } else if (route === 'home') {
       setSignedIn(true)
     }
+
     setRoute(route)
   }
   const raw = JSON.stringify({
@@ -89,19 +90,22 @@ function App () {
   const onInputChange = event => {
     setInput(event.target.value)
   }
+  const image = document.getElementById('inputimage')
   const calculateFaceLocation = data => {
-    const image = document.getElementById('inputimage')
     const width = Number(image.width)
     const height = Number(image.height)
-    return data.outputs[0].data.regions.map(region => {
-      const clarifaiFace = region.region_info.bounding_box
+    const faceLocations = data.outputs[0].data.regions.map(region => {
+      const { left_col, top_row, right_col, bottom_row } =
+        region.region_info.bounding_box
       return {
-        leftCol: clarifaiFace.left_col * width,
-        topRow: clarifaiFace.top_row * height,
-        rightCol: width - clarifaiFace.right_col * width,
-        bottomRow: height - clarifaiFace.bottom_row * height
+        leftCol: left_col * width,
+        topRow: top_row * height,
+        rightCol: width - right_col * width,
+        bottomRow: height - bottom_row * height
       }
     })
+
+    return faceLocations
   }
 
   const [faceBox, setFaceBox] = React.useState({})
@@ -112,26 +116,25 @@ function App () {
 
   const onButtonSubmit = async () => {
     setMyImage(input)
+
     try {
       const response = await fetch(
         'https://api.clarifai.com/v2/models/' + MODEL_ID + '/outputs',
         requestOptions
       )
       const result = await response.json()
-      if ((input !== null) & (input !== undefined) & (input !== '')) {
-        fetch('http://localhost:3000/image', {
+
+      if (input !== null && input !== undefined && input !== '') {
+        const imageUploadResponse = await fetch('http://localhost:3000/image', {
           method: 'put',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: user.id
-          })
+          body: JSON.stringify({ id: user.id })
         })
-          .then(response => response.json())
-          .then(count => {
-            setUser({ ...user, entries: count })
-          })
-          .catch(console.log)
+        const count = await imageUploadResponse.json()
+        const entryCount = Number(count.count.entries)
+        setUser({ ...user, entries: entryCount })
       }
+
       const faceLocation = calculateFaceLocation(result)
       displayFaceBox(faceLocation)
     } catch (error) {

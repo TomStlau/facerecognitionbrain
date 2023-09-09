@@ -13,6 +13,20 @@ import Signin from './components/Signin/Signin'
 import Register from './components/Register/Register'
 import defaultConfig from './Config/Config'
 
+const initialState = {
+  input: '',
+  imageUrl: '',
+  box: {},
+  route: 'signin',
+  isSignedIn: false,
+  user: {
+    id: '',
+    name: '',
+    email: '',
+    entries: 0,
+    joined: ''
+  }
+}
 function App () {
   const [route, setRoute] = React.useState('signin')
   const [input, setInput] = React.useState('')
@@ -30,11 +44,7 @@ function App () {
   const [signedIn, setSignedIn] = React.useState(false)
 
   const [user, setUser] = React.useState({
-    id: '',
-    name: '',
-    email: '',
-    entries: 0,
-    joined: ''
+    initialState
   })
 
   const loadUser = data => {
@@ -51,7 +61,9 @@ function App () {
 
   const onRouteChange = route => {
     if (route === 'signout') {
-      setSignedIn(false)
+      setUser({
+        initialState
+      })
       // empty image url
       setMyImage('')
     } else if (route === 'home') {

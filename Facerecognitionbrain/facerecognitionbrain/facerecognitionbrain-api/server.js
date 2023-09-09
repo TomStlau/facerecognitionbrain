@@ -3,6 +3,7 @@ import bodyParser from 'body-parser'
 import bcrypt from 'bcrypt'
 import cors from 'cors'
 import knex from 'knex'
+import register from './Controllers/register.js'
 
 const db = knex({
   client: 'pg',
@@ -47,27 +48,7 @@ app.post('/signin', (req, res) => {
 })
 
 app.post('/register', (req, res) => {
-  const { email, name, password } = req.body
-  const hash = bcrypt.hashSync(password, 10)
-  db.transaction(trx => {
-    trx
-      .insert({
-        hash: hash,
-        email: email
-      })
-      .into('login')
-      .returning('email')
-      .then(async email => {
-        const user = await trx('users').returning('*').insert({
-          email: email[0].email,
-          name: name,
-          joined: new Date()
-        })
-        res.json(user[0])
-      })
-      .then(trx.commit)
-      .catch(trx.rollback)
-  }).catch(err => res.status(400).json('unable to register'))
+  register.handleRegister(req, res, db, bcrypt)
 })
 
 app.get('/profile/:id', (req, res) => {

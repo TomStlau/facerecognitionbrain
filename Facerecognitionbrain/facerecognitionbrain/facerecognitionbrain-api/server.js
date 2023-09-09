@@ -4,6 +4,7 @@ import bcrypt from 'bcrypt'
 import cors from 'cors'
 import knex from 'knex'
 import register from './Controllers/register.js'
+import signin from '../src/components/Signin/Signin.js'
 
 const db = knex({
   client: 'pg',
@@ -20,31 +21,7 @@ app.use(bodyParser.json())
 app.use(cors())
 
 app.post('/signin', (req, res) => {
-  const { email, password } = req.body
-  if (!email || !password) {
-    return res.status(400).json('incorrect form submission')
-  }
-  db.select('email', 'hash')
-    .from('login')
-    .where('email', '=', email)
-    .then(data => {
-      const isValid = bcrypt.compareSync(password, data[0].hash)
-      if (isValid) {
-        return db
-          .select('*')
-          .from('users')
-          .where('email', '=', email)
-          .then(user => {
-            res.json(user[0])
-          })
-          .catch(err => res.status(400).json('unable to get user'))
-      } else {
-        res.status(400).json('The email or the password is not correct.')
-      }
-    })
-    .catch(err =>
-      res.status(400).json('The email or the password is not correct.')
-    )
+  signin.handleSignin(req, res, db, bcrypt)
 })
 
 app.post('/register', (req, res) => {

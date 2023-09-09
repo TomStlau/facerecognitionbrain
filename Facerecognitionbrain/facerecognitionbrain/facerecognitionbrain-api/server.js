@@ -5,6 +5,8 @@ import cors from 'cors'
 import knex from 'knex'
 import register from './Controllers/register.js'
 import signin from '../src/components/Signin/Signin.js'
+import profileServer from './Controllers/profileServer.js'
+import image from './Controllers/image.js'
 
 const db = knex({
   client: 'pg',
@@ -29,30 +31,11 @@ app.post('/register', (req, res) => {
 })
 
 app.get('/profile/:id', (req, res) => {
-  const { id } = req.params
-  db.select('*')
-    .from('users')
-    .where({ id: id })
-    .then(user => {
-      if (user.length) {
-        res.json(user[0])
-      } else {
-        res.status(400).json('Not found')
-      }
-    })
-    .catch(err => res.status(400).json('error getting user'))
+  profileServer.handleProfile(req, res, db)
 })
 
 app.put('/image', (req, res) => {
-  const { id } = req.body
-  db('users')
-    .where('id', '=', id)
-    .increment('entries', 1)
-    .returning('entries')
-    .then(entries => {
-      res.json({ count: entries[0] })
-    })
-    .catch(err => res.status(400).json('unable to get entries'))
+  image.handleImage(req, res, db)
 })
 
 const PORT = process.env.PORT

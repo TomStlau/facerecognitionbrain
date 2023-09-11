@@ -1,4 +1,4 @@
-const handleImage = db => (req, res) => {
+const handleImage = (db, req, res) => {
   const { id } = req.body
   db('users')
     .where('id', '=', id)
@@ -10,4 +10,4 @@ const handleImage = db => (req, res) => {
     .catch(err => res.status(400).json('unable to get entries'))
 }
 
-export default handleImage
+export { handleImage }

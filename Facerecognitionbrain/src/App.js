@@ -11,14 +11,13 @@ import ParticlesCongig from './components/ParticlesConfig/ParticlesConfig'
 import FaceRecognition from './components/FaceRecognition/FaceRecognition'
 import Signin from './components/Signin/Signin'
 import Register from './components/Register/Register'
-import defaultConfig from './Config/Config'
+import defaultConfig from './config/config'
 
 const initialState = {
   input: '',
   imageUrl: '',
   box: {},
-  route: 'signin',
-  isSignedIn: false,
+  signedIn: false,
   user: {
     id: '',
     name: '',
@@ -61,6 +60,7 @@ function App () {
 
   const onRouteChange = route => {
     if (route === 'signout') {
+      setSignedIn(false)
       setUser({
         initialState
       })
